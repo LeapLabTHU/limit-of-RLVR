@@ -125,8 +125,13 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n\n",
     ),
+    # "abel": (
+    #     "Question:\n{input}\nAnswer:\nLet's think step by step.\n",
+    #     "{output}",
+    #     "\n\n",
+    # ),
     "abel": (
-        "Question:\n{input}\nAnswer:\nLet's think step by step.\n",
+        "A conversation between user and assistant. The user asks a question, and the assistant solves it. The time limit is set to 20,480 tokens. If the assistant's response exceeds this limit, a progressively increasing penalty with the number of tokens exceeded will be applied.\nuser\nSolve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.\n{input}\nRemember to put your answer on its own line after \"Answer:\".\nassistant",
         "{output}",
         "\n\n",
     ),

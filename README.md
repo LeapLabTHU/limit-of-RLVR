@@ -50,7 +50,7 @@ Our conclusion:
 4. **RLVR and distillation are fundamentally different.**  
  
 
-### Mutiple Sampling in vLLM
+## Mutiple Sampling in vLLM
 
 In our experiments, we ultilize two key mechanisms of vLLM to ensure response diversity across different runs and within a single run's multiple samplings:
 
@@ -80,6 +80,20 @@ vLLM automatically manages randomness by progressing the random state sequential
 
 Enter `math` and read `README`.
 
+
+## Acknowledgements
+
+Our evaluation code is based on the following open-source projects:
+
+- [SimpleRLZoo](https://github.com/hkust-nlp/simpleRL-reason)
+- [Code-R1](https://github.com/ganler/code-r1)
+- [EasyR1](https://github.com/hiyouga/EasyR1/)
+- [DeepCoder](https://github.com/agentica-project/rllm)
+
+We also extend our gratitude for the open-sourced checkpoints from:
+
+- DAPO: [BytedTsinghua-SIA/DAPO-Qwen-32B](https://huggingface.co/BytedTsinghua-SIA/DAPO-Qwen-32B)
+- Oat-Zero: [sail/Qwen2.5-Math-7B-Oat-Zero](https://huggingface.co/sail/Qwen2.5-Math-7B-Oat-Zero)
 
 
 

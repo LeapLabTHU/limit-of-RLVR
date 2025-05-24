@@ -14,6 +14,13 @@
 </div>
 
 
+## News
+
+- **2025.5.17**: Updated the paper on [arXiv](https://arxiv.org/abs/2504.13837) with new experiments involving DAPO and DeepScaler. Added detailed analysis on entropy, KL divergence, and the impact of rollout numbers.
+- **2025.5.24**: Released evaluation code for Math and updated the README to reflect these changes.
+
+
+
 ## Overview
 
 
@@ -32,16 +39,48 @@ To answer this, we evaluate models using the **pass@k** metric—where success r
 Our conclusion:
 
 1. **RL-trained models perform worse than base models in pass@k at large *k*.**  
-   RL-trained models beat base models at low sampling sizes, but base models **consistently outperform them** at larger *k*. Manual inspection shows that base models generate **diverse reasoning paths**, often producing at least one correct solution, even for tasks thought to require RL training.
+  
 
 2. **RL boosts sampling efficiency but reduces the reasoning capacity boundary.**  
-   RLVR-trained models only generate reasoning paths **already present in the base model**. This training biases the model toward previously rewarded solutions, sacrificing exploration. RLVR doesn't expand the model’s problem-solving potential—it just sharpens what’s already there.
+  
 
 3. **RLVR algorithms perform similarly and remain far from optimal.**  
-   Comparing PPO, GRPO, and Reinforce++, we find only **minor differences**. The gap in sampling efficiency (∆SE) stays large, suggesting that all current RL approaches fall **well short of optimal performance**.
+   
 
 4. **RLVR and distillation are fundamentally different.**  
-   While RLVR improves sampling, **distillation can introduce new knowledge**. Distilled models often expand their reasoning ability, unlike RLVR-trained models, which remain **bounded by the base model's capacity**.
+ 
+
+### Mutiple Sampling in vLLM
+
+In our experiments, we ultilize two key mechanisms of vLLM to ensure response diversity across different runs and within a single run's multiple samplings:
+
+#### 1. Cross-Run Diversity via Seed Control
+
+When initializing the `LLM` engine:
+
+```python
+LLM(seed=args.seed, ...)
+```
+
+vLLM uses the provided seed to initialize its internal random number generator. This means that different runs with different seeds will produce completely different response sequences, and changing the seed (e.g., `--seed 1` vs `--seed 2`) creates distinct sampling trajectories.
+
+#### 2. Intra-Run Diversity
+
+When performing multiple samplings in a single run (e.g., `--n_sampling 32`):
+
+```python
+SamplingParams(n=32, T=0.6, ...)  # Per-call sampling
+```
+
+vLLM automatically manages randomness by progressing the random state sequentially for each sampling call, and maintaining independent sampling trajectories even with identical parameters, thus ensuring diversity across samplings without manual seed adjustment.
+
+## Evaluation
+
+### Math
+
+Enter `math` and read `README`.
+
+
 
 
 ## Citation

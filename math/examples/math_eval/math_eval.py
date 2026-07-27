@@ -136,7 +136,7 @@ def setup(args):
             trust_remote_code=True,
             seed=args.seed,
             gpu_memory_utilization=0.9,
-            max_model_len=4096,
+            max_model_len=32768,
         )
         tokenizer = None
         if args.apply_chat_template:

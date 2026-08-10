@@ -41,6 +41,22 @@ echo "Sharding $TOTAL questions from $BENCHMARK across $NUM_GPUS GPUs (n_samplin
 SHARD_ROOT=$(mktemp -d "${OUTPUT_DIR%/}/model_shards.XXXXXX")
 trap 'rm -rf "$SHARD_ROOT"' EXIT
 
+# HF cache dirs (e.g. ~/.cache/huggingface/hub/.../snapshots/<hash>/) store
+# files as symlinks relative to a sibling blobs/ dir two levels up
+# (config.json -> ../../blobs/<hash>). `cp -al` preserves symlinks as-is, so
+# copying such a dir elsewhere breaks every link. Resolve each entry to its
+# real target first, then hardlink that — works for both symlink-based HF
+# cache dirs and plain (already-real-file) checkpoint dirs.
+link_model_dir() {
+    local src=$1 dst=$2
+    mkdir -p "$dst"
+    for f in "$src"/*; do
+        local real
+        real=$(readlink -f "$f")
+        ln "$real" "$dst/$(basename "$f")" 2>/dev/null || cp "$real" "$dst/$(basename "$f")"
+    done
+}
+
 per_shard=$(( (TOTAL + NUM_GPUS - 1) / NUM_GPUS ))
 pids=()
 for ((g=0; g<NUM_GPUS; g++)); do
@@ -53,7 +69,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
         end=-1
     fi
     shard_model_dir="$SHARD_ROOT/gpu${g}"
-    cp -al "$MODEL_DIR" "$shard_model_dir"
+    link_model_dir "$MODEL_DIR" "$shard_model_dir"
     echo "GPU $g: questions [$start, $end), private model copy at $shard_model_dir"
     CUDA_VISIBLE_DEVICES=$g TOKENIZERS_PARALLELISM=false python -u math_eval.py \
         --model_name_or_path "$shard_model_dir" \

@@ -135,7 +135,7 @@ def setup(args):
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
             seed=args.seed,
-            gpu_memory_utilization=0.9,
+            gpu_memory_utilization=0.95,
             max_model_len=32768,
         )
         tokenizer = None

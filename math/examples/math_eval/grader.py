@@ -215,8 +215,14 @@ def math_equal(
         pred = f"{pred[0].strip()} - ({pred[1].strip()})"
         ref = reference.split("=")
         ref = f"{ref[0].strip()} - ({ref[1].strip()})"
-        if symbolic_equal(pred, ref) or symbolic_equal(f"-({pred})", ref):
-            return True
+        if timeout:
+            if call_with_timeout(symbolic_equal_process, pred, ref) or call_with_timeout(
+                symbolic_equal_process, f"-({pred})", ref
+            ):
+                return True
+        else:
+            if symbolic_equal(pred, ref) or symbolic_equal(f"-({pred})", ref):
+                return True
     elif (
         prediction.count("=") == 1
         and len(prediction.split("=")[0].strip()) <= 2
@@ -325,7 +331,10 @@ def call_with_timeout(func, *args, timeout=1, **kwargs):
 
     if process.is_alive():
         process.terminate()
-        process.join()
+        process.join(timeout=5)
+        if process.is_alive():
+            process.kill()
+            process.join()
         return False
 
     return output_queue.get()
